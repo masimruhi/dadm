@@ -1,0 +1,16 @@
+.Rhistory
+.RData
+.Rproj.user/
+.DS_Store
+*.log
+*.aux
+*.out
+*.toc
+*.nav
+*.snm
+*.vrb
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*_cache/
+*_files/

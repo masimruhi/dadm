@@ -1,0 +1,261 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "",
+    "text": "Student: Mustafa Asım Ruhi\nStudent number: 401190044\nCourse: Data Analysis for Decision-Making\nUniversity: Fresenius University of Applied Sciences\nEmail: ruhi.mustafa@stud.hs-fresenius.de\n\n1 Introduction\nModern companies receive large amounts of customer feedback through social media, online reviews, support chats, and survey comments. Much of this feedback is unstructured text, which means that it cannot be analysed as directly as numerical variables such as sales, prices, or ratings. Sentiment analysis helps convert this kind of text into structured information that can support decision-making (Liu, 2012; Pang & Lee, 2008).\nThis handout focuses on a practical question: How can customer tweets be transformed into decision-relevant insights for airline management? The example uses airline-related tweets and demonstrates a reproducible workflow in R. The goal is not only to classify text as positive or negative, but to connect the result to managerial action.\n\n\n2 What is Sentiment Analysis?\nSentiment analysis is a text analysis method that identifies emotional orientation in written language. In a simple form, the method classifies text as positive, negative, or neutral. More advanced applications can detect emotions, topics, intensity, or changes over time. In business contexts, sentiment analysis is commonly used to monitor customer satisfaction, brand reputation, product feedback, and service quality.\nA typical workflow includes importing text data, cleaning it, splitting the text into smaller units such as words, removing irrelevant words, matching words with sentiment dictionaries, and summarising the results. In R, packages such as tidyverse and tidytext make this workflow relatively accessible and reproducible (Silge & Robinson, 2017; Wickham et al., 2023).\n\n\n3 Why is it Relevant for Decision-Making?\nDecision-makers often need to identify which problems deserve attention first. When feedback is scattered across thousands of tweets, manual reading becomes slow and inconsistent. Sentiment analysis can quickly summarize the emotional tone of customer comments and highlight repeated sources of dissatisfaction.\nFor example, if an airline receives many negative comments about delayed flights, management can improve delay communication, operational punctuality, or compensation processes. If most negative comments refer to customer service, management may prioritize staff training, support capacity, or service recovery. The value of sentiment analysis therefore depends on whether the results lead to concrete decisions.\n\n\n4 Data and Example Context\nThe example uses the Twitter US Airline Sentiment dataset, which contains 14,640 airline-related tweets (CrowdFlower, 2015). The dataset includes the tweet text, the airline, a sentiment label, and, for negative tweets, a reason for the negative sentiment.\n\ntweets |&gt;\n  count(airline_sentiment) |&gt;\n  mutate(share = scales::percent(n / sum(n))) |&gt;\n  knitr::kable(caption = \"Sentiment distribution in the airline tweet dataset\")\n\n\nSentiment distribution in the airline tweet dataset\n\n\nairline_sentiment\nn\nshare\n\n\n\n\nnegative\n9178\n62.7%\n\n\nneutral\n3099\n21.2%\n\n\npositive\n2363\n16.1%\n\n\n\n\n\nThis structure makes the dataset useful for a classroom example. It contains both unstructured text and already labelled sentiment categories. The labels make it possible to compare simple visual summaries with a dictionary-based text mining approach.\n\n\n5 Preparing Data in R\nThe first step is to import and clean the data. The function clean_names() from the janitor package standardises variable names. The select() function keeps only the variables that are relevant for the analysis.\n\nurl &lt;- \"https://raw.githubusercontent.com/ruchitgandhi/Twitter-Airline-Sentiment-Analysis/master/Tweets.csv\"\n\ntweets &lt;- readr::read_csv(url, show_col_types = FALSE) |&gt;\n  janitor::clean_names() |&gt;\n  select(airline_sentiment, negativereason, airline, retweet_count, text, tweet_created)\n\nThis step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later (Huber, 2025).\n\n\n6 Descriptive Analysis of Sentiment\nBefore applying text mining, it is useful to examine the provided sentiment labels. The following figure shows how negative, neutral, and positive tweets are distributed across airlines.\n\nggplot(sentiment_by_airline, aes(x = airline, y = share, fill = airline_sentiment)) +\n  geom_col(position = \"fill\") +\n  scale_y_continuous(labels = scales::percent) +\n  labs(\n    title = \"Customer sentiment differs across airlines\",\n    subtitle = \"Share of negative, neutral, and positive tweets\",\n    x = \"Airline\",\n    y = \"Share of tweets\",\n    fill = \"Sentiment\"\n  ) +\n  theme_minimal()\n\n\n\n\n\n\n\n\nThe figure is useful for decision-making because it allows managers to compare airlines quickly. However, a sentiment label alone is not enough. A manager also needs to understand why customers are dissatisfied.\n\n\n7 Negative Sentiment and Business Problems\nThe dataset contains a variable that explains the reason behind many negative tweets. The following output shows the most frequent reasons for negative sentiment.\n\nnegative_reasons |&gt;\n  slice_max(n, n = 8) |&gt;\n  knitr::kable(caption = \"Most frequent reasons for negative sentiment\")\n\n\nMost frequent reasons for negative sentiment\n\n\nnegativereason\nn\n\n\n\n\nCustomer Service Issue\n2910\n\n\nLate Flight\n1665\n\n\nCan’t Tell\n1190\n\n\nCancelled Flight\n847\n\n\nLost Luggage\n724\n\n\nBad Flight\n580\n\n\nFlight Booking Problems\n529\n\n\nFlight Attendant Complaints\n481\n\n\n\n\n\nThe results connect sentiment analysis to operational decision-making. Negative comments are not random; they often refer to service issues, delayed flights, cancelled flights, baggage problems, or booking problems. Each category suggests a different managerial response.\n\n\n8 Text Mining and Tokenization\nA central step in text mining is tokenization. Tokenization means splitting text into smaller units. In this example, each tweet is split into individual words. Stop words such as “the”, “and”, or “is” are removed because they usually do not provide much meaning for sentiment analysis.\n\ntweets_words &lt;- tweets |&gt;\n  mutate(tweet_id = row_number()) |&gt;\n  select(tweet_id, airline, airline_sentiment, text) |&gt;\n  tidytext::unnest_tokens(word, text) |&gt;\n  anti_join(tidytext::stop_words, by = \"word\")\n\nThe tidy approach is useful because the result is a table in which each row is one word from one tweet. This format can be filtered, counted, joined with dictionaries, and visualised using familiar dplyr and ggplot2 functions (Silge & Robinson, 2017).\n\n\n9 Lexicon-Based Sentiment Analysis\nA lexicon-based method uses a dictionary that assigns sentiment labels to words. In this example, the Bing lexicon is used through the get_sentiments(\"bing\") function. Words from the tweets are matched with positive and negative words from the dictionary.\n\nword_sentiments &lt;- tweets_words |&gt;\n  inner_join(tidytext::get_sentiments(\"bing\"), by = \"word\")\n\nThis method is transparent and easy to explain. However, it has limitations. It may miss sarcasm, context, negation, and domain-specific meanings. For example, the word “delay” may clearly be negative in an airline context, while other words may depend strongly on context.\n\ntop_sentiment_words |&gt;\n  arrange(sentiment, desc(n)) |&gt;\n  group_by(sentiment) |&gt;\n  slice_head(n = 5) |&gt;\n  knitr::kable(caption = \"Frequently matched sentiment words\")\n\n\nFrequently matched sentiment words\n\n\nsentiment\nword\nn\n\n\n\n\nnegative\ndelayed\n545\n\n\nnegative\ndelay\n301\n\n\nnegative\nlost\n243\n\n\nnegative\nworst\n240\n\n\nnegative\nbad\n186\n\n\npositive\nlove\n245\n\n\npositive\nrefund\n147\n\n\npositive\nnice\n135\n\n\npositive\nfree\n132\n\n\npositive\nawesome\n124\n\n\n\n\n\n\n\n10 From Analysis to Managerial Action\nThe final step is to translate analytical results into decisions. A manager should not only ask whether sentiment is positive or negative. A better question is: What action should this result trigger?\n\ndecision_actions |&gt;\n  select(negativereason, n, managerial_action) |&gt;\n  head(8) |&gt;\n  knitr::kable(caption = \"Converting negative sentiment reasons into managerial actions\")\n\n\nConverting negative sentiment reasons into managerial actions\n\n\n\n\n\n\n\nnegativereason\nn\nmanagerial_action\n\n\n\n\nCustomer Service Issue\n2910\nIncrease service capacity and improve service recovery.\n\n\nLate Flight\n1665\nImprove punctuality monitoring and delay communication.\n\n\nCan’t Tell\n1190\nManually review ambiguous complaints before acting.\n\n\nCancelled Flight\n847\nStrengthen rebooking and compensation processes.\n\n\nLost Luggage\n724\nImprove baggage tracking and recovery communication.\n\n\nBad Flight\n580\nMonitor and improve the in-flight customer experience.\n\n\nFlight Booking Problems\n529\nOptimize booking interface and booking support.\n\n\nFlight Attendant Complaints\n481\nInvestigate this complaint category further.\n\n\n\n\n\nThis table shows how sentiment analysis can move from description to decision support. Customer service problems suggest a different response than lost luggage or delayed flights. In this sense, sentiment analysis can help managers prioritize resources.\n\n\n11 Exercise for Students\nRun the following R code and answer the question below.\n\nlibrary(tidyverse)\nlibrary(tidytext)\n\ncustomer_comments &lt;- tibble(\n  text = c(\n    \"The flight was delayed and the service was terrible\",\n    \"The staff was helpful and the flight was comfortable\",\n    \"My luggage was lost and nobody helped me\"\n  )\n)\n\ncustomer_comments |&gt;\n  unnest_tokens(word, text) |&gt;\n  anti_join(stop_words, by = \"word\") |&gt;\n  inner_join(get_sentiments(\"bing\"), by = \"word\") |&gt;\n  count(sentiment)\n\nQuestion: Which managerial action would be most suitable based on the negative words in the comments?\n\nReduce the number of customer support channels\n\nImprove delay communication and luggage recovery processes\n\nIgnore negative comments because they are unstructured data\n\nOnly focus on positive words\n\nCorrect answer: B) Improve delay communication and luggage recovery processes.\n\n\n12 Limitations\nSentiment analysis is useful, but it should not be interpreted as a perfect measurement of customer opinion. Lexicon-based approaches are simple and explainable, but they may fail when language is ironic, ambiguous, or context-dependent. Short social media posts are especially challenging because they often contain abbreviations, slang, or missing context.\nFor managerial decision-making, sentiment analysis should therefore be used as a support tool rather than as a replacement for human judgment. Managers should combine sentiment results with operational indicators, customer service data, and qualitative interpretation.\n\n\n13 Conclusion\nSentiment analysis helps transform unstructured customer feedback into information that can support decision-making. In the airline example, R is used to import tweets, clean data, summarize sentiment labels, tokenize text, apply a sentiment lexicon, and connect complaint categories to managerial actions.\nThe main lesson is that the value of sentiment analysis is not the sentiment label itself. The value is the decision that follows from it. When text analysis identifies repeated customer pain points, managers can prioritize concrete improvements in service, communication, booking processes, or baggage handling.\n\n\n\n\n\n\nTipAffidavit\n\n\n\nI hereby affirm that this submitted paper was authored unaided and solely by me. Additionally, no other sources than those in the reference list were used. Parts of this paper, including tables and figures, that have been taken either verbatim or analogously from other works have in each case been properly cited with regard to their origin and authorship. This paper, either in parts or in its entirety, be it in the same or similar form, has not been submitted to any other examination board and has not been published.\nI acknowledge that the university may use plagiarism detection software to check my thesis. I agree to cooperate with any investigation of suspected plagiarism and to provide any additional information or evidence requested by the university.\nChecklist:\n\nThe handout contains 3-5 pages of text.\nThe submission contains the Quarto file of the handout.\nThe submission contains the Quarto file of the presentation.\nThe submission contains the HTML file of the handout.\nThe submission contains the HTML file of the presentation.\nThe submission contains the PDF file of the handout.\nThe submission contains the PDF file of the presentation.\nThe title page of the presentation and the handout contain personal details: name, email, and matriculation number.\nThe handout contains a bibliography, created using BibTeX with an APA citation style.\nEither the handout or the presentation contains R code that proves the expertise in coding.\nThe filled out Affidavit.\nThe link to the presentation and the handout published on GitHub.\n\nMustafa Asım Ruhi, 2 June 2026, Cologne\n\n\n\n\n14 References\n\n\nCrowdFlower. (2015). Twitter US airline sentiment dataset. https://www.kaggle.com/datasets/crowdflower/twitter-airline-sentiment\n\n\nHuber, S. (2025). How to use r for data science: Lecture notes. Fresenius University of Applied Sciences.\n\n\nLiu, B. (2012). Sentiment analysis and opinion mining. Morgan\n& Claypool Publishers. https://www.cs.uic.edu/~liub/FBS/SentimentAnalysis-and-OpinionMining.pdf\n\n\nPang, B., & Lee, L. (2008). Opinion mining and sentiment analysis. Foundations and Trends in Information Retrieval, 2(1-2), 1–135. https://doi.org/10.1561/1500000011\n\n\nSilge, J., & Robinson, D. (2017). Text mining with r: A tidy approach. O’Reilly Media. https://www.tidytextmining.com/\n\n\nWickham, H., Cetinkaya-Rundel, M., & Grolemund, G. (2023). R for data science: Import, tidy, transform, visualize, and model data (2nd ed.). O’Reilly Media. https://r4ds.hadley.nz/"
+  },
+  {
+    "objectID": "presentation.html#aim-of-the-presentation",
+    "href": "presentation.html#aim-of-the-presentation",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Aim of the Presentation",
+    "text": "Aim of the Presentation\nResearch question\nHow can customer tweets be transformed into decision-relevant insights for airline management?\nRoadmap\n\nExplain sentiment analysis\n\nShow a reproducible R example\n\nTranslate results into managerial decisions\n\nLet students try a short exercise"
+  },
+  {
+    "objectID": "presentation.html#what-is-sentiment-analysis",
+    "href": "presentation.html#what-is-sentiment-analysis",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "What is Sentiment Analysis?",
+    "text": "What is Sentiment Analysis?\n\nSentiment analysis is a text mining method used to identify opinions, emotions, and attitudes in written language.\n\n\n\nPositive\n\n\nNeutral\n\n\nNegative"
+  },
+  {
+    "objectID": "presentation.html#why-does-it-matter-for-decision-making",
+    "href": "presentation.html#why-does-it-matter-for-decision-making",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Why Does it Matter for Decision-Making?",
+    "text": "Why Does it Matter for Decision-Making?\nManagers often face too much customer feedback to read manually.\nSentiment analysis helps to answer:\n\nAre customers mostly satisfied or dissatisfied?\nWhich problems are repeated most often?\nWhich operational area should management prioritize?"
+  },
+  {
+    "objectID": "presentation.html#from-text-to-decision",
+    "href": "presentation.html#from-text-to-decision",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "From Text to Decision",
+    "text": "From Text to Decision\n\n\n\n\n\nflowchart LR\n  A[Customer text] --&gt; B[Clean data]\n  B --&gt; C[Tokenize words]\n  C --&gt; D[Apply sentiment lexicon]\n  D --&gt; E[Summarize patterns]\n  E --&gt; F[Managerial action]"
+  },
+  {
+    "objectID": "presentation.html#r-packages-used",
+    "href": "presentation.html#r-packages-used",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "R Packages Used",
+    "text": "R Packages Used\n\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(tidytext)\nlibrary(lubridate)\nlibrary(scales)\n\nThe workflow mainly uses the tidyverse logic: import, clean, transform, visualize, and interpret."
+  },
+  {
+    "objectID": "presentation.html#dataset",
+    "href": "presentation.html#dataset",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Dataset",
+    "text": "Dataset\nThe example uses airline-related tweets.\n\n\n\n\n\nairline_sentiment\nn\nshare\n\n\n\n\nnegative\n9178\n62.7%\n\n\nneutral\n3099\n21.2%\n\n\npositive\n2363\n16.1%\n\n\n\n\n\nThe dataset contains tweet text, airline names, sentiment labels, and reasons for negative tweets."
+  },
+  {
+    "objectID": "presentation.html#step-1-import-and-clean-data",
+    "href": "presentation.html#step-1-import-and-clean-data",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Step 1: Import and Clean Data",
+    "text": "Step 1: Import and Clean Data\n\ntweets &lt;- readr::read_csv(url, show_col_types = FALSE) |&gt;\n  janitor::clean_names() |&gt;\n  select(\n    airline_sentiment,\n    negativereason,\n    airline,\n    retweet_count,\n    text,\n    tweet_created\n  )"
+  },
+  {
+    "objectID": "presentation.html#step-2-compare-sentiment-by-airline",
+    "href": "presentation.html#step-2-compare-sentiment-by-airline",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Step 2: Compare Sentiment by Airline",
+    "text": "Step 2: Compare Sentiment by Airline"
+  },
+  {
+    "objectID": "presentation.html#step-3-identify-negative-reasons",
+    "href": "presentation.html#step-3-identify-negative-reasons",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Step 3: Identify Negative Reasons",
+    "text": "Step 3: Identify Negative Reasons"
+  },
+  {
+    "objectID": "presentation.html#interpretation",
+    "href": "presentation.html#interpretation",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Interpretation",
+    "text": "Interpretation\nThe analysis moves from general sentiment to concrete business problems.\nExamples:\n\nCustomer service issue -&gt; support and service recovery\nLate flight -&gt; punctuality and delay communication\nLost luggage -&gt; baggage tracking and recovery\nCancelled flight -&gt; rebooking and compensation"
+  },
+  {
+    "objectID": "presentation.html#step-4-tokenize-tweet-text",
+    "href": "presentation.html#step-4-tokenize-tweet-text",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Step 4: Tokenize Tweet Text",
+    "text": "Step 4: Tokenize Tweet Text\n\ntweets_words &lt;- tweets |&gt;\n  mutate(tweet_id = row_number()) |&gt;\n  select(tweet_id, airline, airline_sentiment, text) |&gt;\n  unnest_tokens(word, text) |&gt;\n  anti_join(stop_words, by = \"word\")\n\nTokenization splits each tweet into individual words."
+  },
+  {
+    "objectID": "presentation.html#step-5-apply-a-sentiment-lexicon",
+    "href": "presentation.html#step-5-apply-a-sentiment-lexicon",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Step 5: Apply a Sentiment Lexicon",
+    "text": "Step 5: Apply a Sentiment Lexicon\n\nword_sentiments &lt;- tweets_words |&gt;\n  inner_join(get_sentiments(\"bing\"), by = \"word\")\n\nA lexicon-based approach matches words with a dictionary of positive and negative terms."
+  },
+  {
+    "objectID": "presentation.html#most-frequent-sentiment-words",
+    "href": "presentation.html#most-frequent-sentiment-words",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Most Frequent Sentiment Words",
+    "text": "Most Frequent Sentiment Words"
+  },
+  {
+    "objectID": "presentation.html#sentiment-score-by-airline",
+    "href": "presentation.html#sentiment-score-by-airline",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Sentiment Score by Airline",
+    "text": "Sentiment Score by Airline"
+  },
+  {
+    "objectID": "presentation.html#from-analysis-to-decision-making",
+    "href": "presentation.html#from-analysis-to-decision-making",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "From Analysis to Decision-Making",
+    "text": "From Analysis to Decision-Making\n\n\n\n\n\n\n\n\n\n\nnegativereason\nn\nmanagerial_action\n\n\n\n\nCustomer Service Issue\n2910\nImprove support capacity and service recovery.\n\n\nLate Flight\n1665\nImprove delay communication and operational punctuality.\n\n\nCan’t Tell\n1190\nManually review ambiguous complaints.\n\n\nCancelled Flight\n847\nStrengthen proactive rebooking and compensation process.\n\n\nLost Luggage\n724\nImprove baggage tracking and recovery process.\n\n\nBad Flight\n580\nMonitor and improve in-flight experience."
+  },
+  {
+    "objectID": "presentation.html#key-decision-logic",
+    "href": "presentation.html#key-decision-logic",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Key Decision Logic",
+    "text": "Key Decision Logic\nThe important question is not only:\n\nWhat is the sentiment?\n\nThe better managerial question is:\n\nWhat decision should this sentiment trigger?"
+  },
+  {
+    "objectID": "presentation.html#strengths",
+    "href": "presentation.html#strengths",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Strengths",
+    "text": "Strengths\n\nFast summary of large text data\nReproducible workflow in R\nUseful for customer experience monitoring\nHelps prioritize operational problems"
+  },
+  {
+    "objectID": "presentation.html#limitations",
+    "href": "presentation.html#limitations",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Limitations",
+    "text": "Limitations\n\nSarcasm and irony are difficult\nShort tweets can be ambiguous\nLexicons may miss context\nHuman interpretation is still necessary"
+  },
+  {
+    "objectID": "presentation.html#in-class-exercise",
+    "href": "presentation.html#in-class-exercise",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "In-Class Exercise",
+    "text": "In-Class Exercise\n\nStudents analyze three short customer comments in R and recommend one managerial action.\n\n\ncustomer_comments &lt;- tibble(\n  text = c(\n    \"The flight was delayed and the service was terrible\",\n    \"The staff was helpful and the flight was comfortable\",\n    \"My luggage was lost and nobody helped me\"\n  )\n)\n\ncustomer_comments |&gt;\n  unnest_tokens(word, text) |&gt;\n  anti_join(stop_words, by = \"word\") |&gt;\n  inner_join(get_sentiments(\"bing\"), by = \"word\") |&gt;\n  count(sentiment)"
+  },
+  {
+    "objectID": "presentation.html#exercise-code",
+    "href": "presentation.html#exercise-code",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Exercise Code",
+    "text": "Exercise Code\n\nlibrary(tidyverse)\nlibrary(tidytext)\n\ncustomer_comments &lt;- tibble(\n  text = c(\n    \"The flight was delayed and the service was terrible\",\n    \"The staff was helpful and the flight was comfortable\",\n    \"My luggage was lost and nobody helped me\"\n  )\n)\n\ncustomer_comments |&gt;\n  unnest_tokens(word, text) |&gt;\n  anti_join(stop_words, by = \"word\") |&gt;\n  inner_join(get_sentiments(\"bing\"), by = \"word\") |&gt;\n  count(sentiment)"
+  },
+  {
+    "objectID": "presentation.html#conclusion",
+    "href": "presentation.html#conclusion",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Conclusion",
+    "text": "Conclusion\n\nSentiment analysis turns unstructured customer feedback into practical decision support.\n\n\nFor managers, the key question is not only: “What is the sentiment?” It is: “What decision should this sentiment trigger?”"
+  },
+  {
+    "objectID": "presentation.html#references",
+    "href": "presentation.html#references",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "References",
+    "text": "References"
+  },
+  {
+    "objectID": "presentation.html#presentation-details",
+    "href": "presentation.html#presentation-details",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Presentation Details",
+    "text": "Presentation Details\nPresenter: Mustafa Asım Ruhi\nStudent number: 401190044\nCourse: Data Analysis for Decision-Making\nUniversity: Fresenius University of Applied Sciences\nEmail: ruhi.mustafa@stud.hs-fresenius.de"
+  },
+  {
+    "objectID": "presentation.html#research-question",
+    "href": "presentation.html#research-question",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Research Question",
+    "text": "Research Question\n\nHow can customer tweets be transformed into decision-relevant insights for airline management?"
+  },
+  {
+    "objectID": "presentation.html#why-it-matters-for-decision-making",
+    "href": "presentation.html#why-it-matters-for-decision-making",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Why It Matters for Decision-Making",
+    "text": "Why It Matters for Decision-Making\n\n\nCompanies receive large amounts of customer feedback.\n\n\nManagers need fast and structured insights.\n\n\nSentiment analysis helps prioritize business actions."
+  },
+  {
+    "objectID": "presentation.html#from-text-to-managerial-action",
+    "href": "presentation.html#from-text-to-managerial-action",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "From Text to Managerial Action",
+    "text": "From Text to Managerial Action\n\n\n1Collect text\n\n\n2Clean data\n\n\n3Measure sentiment\n\n\n4Find problems\n\n\n5Recommend action"
+  },
+  {
+    "objectID": "presentation.html#case-study-airline-tweets",
+    "href": "presentation.html#case-study-airline-tweets",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Case Study: Airline Tweets",
+    "text": "Case Study: Airline Tweets\n\nThe example uses 14,640 airline-related tweets classified as negative, neutral, or positive.\n\n\n\n\n\n\nSentiment\nTweets\nShare\n\n\n\n\nnegative\n9178\n62.7%\n\n\nneutral\n3099\n21.2%\n\n\npositive\n2363\n16.1%"
+  },
+  {
+    "objectID": "presentation.html#sentiment-by-airline",
+    "href": "presentation.html#sentiment-by-airline",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Sentiment by Airline",
+    "text": "Sentiment by Airline"
+  },
+  {
+    "objectID": "presentation.html#main-negative-reasons",
+    "href": "presentation.html#main-negative-reasons",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Main Negative Reasons",
+    "text": "Main Negative Reasons"
+  },
+  {
+    "objectID": "presentation.html#r-workflow-tokenization",
+    "href": "presentation.html#r-workflow-tokenization",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "R Workflow: Tokenization",
+    "text": "R Workflow: Tokenization\n\ntweets_words &lt;- tweets |&gt;\n  mutate(tweet_id = row_number()) |&gt;\n  select(tweet_id, airline, airline_sentiment, text) |&gt;\n  unnest_tokens(word, text) |&gt;\n  anti_join(stop_words, by = \"word\")"
+  },
+  {
+    "objectID": "presentation.html#lexicon-based-sentiment-analysis",
+    "href": "presentation.html#lexicon-based-sentiment-analysis",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Lexicon-Based Sentiment Analysis",
+    "text": "Lexicon-Based Sentiment Analysis\n\nword_sentiments &lt;- tweets_words |&gt;\n  inner_join(get_sentiments(\"bing\"), by = \"word\")"
+  },
+  {
+    "objectID": "presentation.html#frequent-sentiment-words",
+    "href": "presentation.html#frequent-sentiment-words",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Frequent Sentiment Words",
+    "text": "Frequent Sentiment Words"
+  },
+  {
+    "objectID": "presentation.html#from-analysis-to-decisions",
+    "href": "presentation.html#from-analysis-to-decisions",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "From Analysis to Decisions",
+    "text": "From Analysis to Decisions\n\n\n\n\n\n\n\n\n\n\nProblem\nTweets\nManagerial action\n\n\n\n\nCustomer Service Issue\n2910\nImprove support capacity and service recovery.\n\n\nLate Flight\n1665\nImprove delay communication and punctuality.\n\n\nCan’t Tell\n1190\nInvestigate this category further.\n\n\nCancelled Flight\n847\nStrengthen rebooking and compensation.\n\n\nLost Luggage\n724\nImprove baggage tracking."
+  },
+  {
+    "objectID": "presentation.html#managerial-interpretation",
+    "href": "presentation.html#managerial-interpretation",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Managerial Interpretation",
+    "text": "Managerial Interpretation\n\nThe real value is not only knowing whether customers are happy or unhappy.\n\n\nThe real value is knowing which operational problem should be solved first."
+  },
+  {
+    "objectID": "presentation.html#strengths-and-limitations",
+    "href": "presentation.html#strengths-and-limitations",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Strengths and Limitations",
+    "text": "Strengths and Limitations\n\n\nStrengths Fast analysis Reproducible workflow Useful for monitoring\n\n\nLimitations Sarcasm is difficult Context can be missed Human interpretation is needed"
+  },
+  {
+    "objectID": "presentation.html#thank-you",
+    "href": "presentation.html#thank-you",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Thank You",
+    "text": "Thank You\n\nMustafa Asım Ruhi Student number: 401190044 Data Analysis for Decision-Making 2 June 2026"
+  }
+]
