@@ -107,6 +107,21 @@ decision_actions <- negative_reasons |>
   )
 ```
 
+
+## Online Access
+
+The handout and presentation are available online via GitHub Pages. Students can scan the QR code below to access the handout directly during the presentation.
+
+::: {.callout-note title="Access the Handout" icon=false}
+
+![](fig/handout_qr.png){fig-align="center" width="35%"}
+
+- **Handout:** <https://masimruhi.github.io/dadm/index.html>
+- **Presentation:** <https://masimruhi.github.io/dadm/presentation.html>
+- **Repository:** <https://github.com/masimruhi/dadm>
+
+:::
+
 # Introduction
 
 Modern companies receive large amounts of customer feedback through social media, online reviews, support chats, and survey comments. Much of this feedback is unstructured text, which means that it cannot be analysed as directly as numerical variables such as sales, prices, or ratings. Sentiment analysis helps convert this kind of text into structured information that can support decision-making [@Liu2012Sentiment; @Pang2008Opinion].
@@ -275,14 +290,6 @@ Sentiment analysis helps transform unstructured customer feedback into informati
 The main lesson is that the value of sentiment analysis is not the sentiment label itself. The value is the decision that follows from it. When text analysis identifies repeated customer pain points, managers can prioritize concrete improvements in service, communication, booking processes, or baggage handling.
 
 
-
-## Online Access
-
-The handout and presentation are available online via GitHub Pages:
-
-- Handout: https://masimruhi.github.io/dadm/index.html
-- Presentation: https://masimruhi.github.io/dadm/presentation.html
-- Repository: https://github.com/masimruhi/dadm
 
 ::: {.callout-tip title="Affidavit" icon=false}
 I hereby affirm that this submitted paper was authored unaided and solely by me. Additionally, no other sources than those in the reference list were used. Parts of this paper, including tables and figures, that have been taken either verbatim or analogously from other works have in each case been properly cited with regard to their origin and authorship. This paper, either in parts or in its entirety, be it in the same or similar form, has not been submitted to any other examination board and has not been published.
