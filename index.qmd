@@ -35,12 +35,11 @@ execute:
 student-number: "401190044"
 ---
 
-**Student:** Mustafa Asım Ruhi  
-**Student number:** 401190044  
-**Course:** Data Analysis for Decision-Making  
-**University:** Fresenius University of Applied Sciences  
-**Email:** ruhi.mustafa@stud.hs-fresenius.de
-
+**Student:** Mustafa Asım Ruhi\
+**Student number:** 401190044\
+**Course:** Data Analysis for Decision-Making\
+**University:** Fresenius University of Applied Sciences\
+**Email:** ruhi.mustafa\@stud.hs-fresenius.de
 
 ```{r setup, include=FALSE}
 if (!require(pacman)) install.packages("pacman")
@@ -107,19 +106,16 @@ decision_actions <- negative_reasons |>
   )
 ```
 
-
 ## Online Access
 
 The handout and presentation are available online via GitHub Pages. Students can scan the QR code below to access the handout directly during the presentation.
 
-::: {.callout-note title="Access the Handout" icon=false}
-
+::: {.callout-note title="Access the Handout" icon="false"}
 ![](fig/handout_qr.png){fig-align="center" width="35%"}
 
 - **Handout:** <https://masimruhi.github.io/dadm/index.html>
 - **Presentation:** <https://masimruhi.github.io/dadm/presentation.html>
 - **Repository:** <https://github.com/masimruhi/dadm>
-
 :::
 
 # Introduction
@@ -139,6 +135,8 @@ A typical workflow includes importing text data, cleaning it, splitting the text
 Decision-makers often need to identify which problems deserve attention first. When feedback is scattered across thousands of tweets, manual reading becomes slow and inconsistent. Sentiment analysis can quickly summarize the emotional tone of customer comments and highlight repeated sources of dissatisfaction.
 
 For example, if an airline receives many negative comments about delayed flights, management can improve delay communication, operational punctuality, or compensation processes. If most negative comments refer to customer service, management may prioritize staff training, support capacity, or service recovery. The value of sentiment analysis therefore depends on whether the results lead to concrete decisions.
+
+There are different approaches to sentiment analysis, including lexicon-based methods, machine learning methods, transformer-based models, and hybrid approaches. This project focuses on a lexicon-based approach because it is transparent, reproducible in RStudio, and suitable for a short live demonstration.
 
 # Data and Example Context
 
@@ -289,9 +287,7 @@ Sentiment analysis helps transform unstructured customer feedback into informati
 
 The main lesson is that the value of sentiment analysis is not the sentiment label itself. The value is the decision that follows from it. When text analysis identifies repeated customer pain points, managers can prioritize concrete improvements in service, communication, booking processes, or baggage handling.
 
-
-
-::: {.callout-tip title="Affidavit" icon=false}
+::: {.callout-tip title="Affidavit" icon="false"}
 I hereby affirm that this submitted paper was authored unaided and solely by me. Additionally, no other sources than those in the reference list were used. Parts of this paper, including tables and figures, that have been taken either verbatim or analogously from other works have in each case been properly cited with regard to their origin and authorship. This paper, either in parts or in its entirety, be it in the same or similar form, has not been submitted to any other examination board and has not been published.
 
 I acknowledge that the university may use plagiarism detection software to check my thesis. I agree to cooperate with any investigation of suspected plagiarism and to provide any additional information or evidence requested by the university.
