@@ -1105,6 +1105,46 @@ Sentiment analysis helps prioritize business actions.
 </div>
 </div>
 </section>
+<section id="different-sentiment-analysis-methods" class="slide level2 center">
+<h2>Different Sentiment Analysis Methods</h2>
+<table class="caption-top">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Basic idea</th>
+<th>Why not used / selected?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Lexicon-based</td>
+<td>Uses predefined sentiment dictionaries</td>
+<td>Selected because it is transparent and easy to reproduce in RStudio</td>
+</tr>
+<tr class="even">
+<td>Machine learning</td>
+<td>Trains a model on labeled text data</td>
+<td>Requires training/testing setup</td>
+</tr>
+<tr class="odd">
+<td>Transformer-based</td>
+<td>Uses context-aware models such as BERT</td>
+<td>More complex for a short live demo</td>
+</tr>
+<tr class="even">
+<td>Hybrid</td>
+<td>Combines dictionaries and machine learning</td>
+<td>More advanced setup</td>
+</tr>
+</tbody>
+</table>
+<p>In this project, I use a lexicon-based approach because it is transparent, reproducible, and suitable for a short RStudio demonstration.</p>
+</section>
 <section id="from-text-to-managerial-action" class="slide level2 center">
 <h2>From Text to Managerial Action</h2>
 <div class="flow-grid">

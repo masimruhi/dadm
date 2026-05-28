@@ -136,6 +136,18 @@ Sentiment analysis is a text mining method used to identify opinions, emotions, 
 <div class="box">Sentiment analysis helps prioritize business actions.</div>
 </div>
 
+## Different Sentiment Analysis Methods
+
+| Method | Basic idea | Why not used / selected? |
+|---|---|---|
+| Lexicon-based | Uses predefined sentiment dictionaries | Selected because it is transparent and easy to reproduce in RStudio |
+| Machine learning | Trains a model on labeled text data | Requires training/testing setup |
+| Transformer-based | Uses context-aware models such as BERT | More complex for a short live demo |
+| Hybrid | Combines dictionaries and machine learning | More advanced setup |
+
+
+In this project, I use a lexicon-based approach because it is transparent, reproducible, and suitable for a short RStudio demonstration.
+
 ## From Text to Managerial Action
 
 <div class="flow-grid">
