@@ -21,8 +21,10 @@ abstract: "This handout explains how sentiment analysis can support managerial d
 
 format:
   apaquarto-pdf:
+    number-sections: true
     documentmode: doc
   html:
+    number-sections: true
     embed-resources: true
     page-layout: article
 
