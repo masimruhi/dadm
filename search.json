@@ -158,7 +158,7 @@
     "href": "presentation.html#references",
     "title": "Decision Making with Sentiment Analysis in R",
     "section": "References",
-    "text": "References\n\n\nHuber, S. (2025). How to use R for data science. https://hubchev.github.io/ds/\n\n\nLiu, B. (2012). Sentiment analysis and opinion mining. Morgan & Claypool Publishers.\n\n\nPang, B., & Lee, L. (2008). Opinion mining and sentiment analysis. Foundations and Trends in Information Retrieval, 2(1–2), 1–135.\n\n\nSilge, J., & Robinson, D. (2017). Text mining with R: A tidy approach. O’Reilly Media.\n\n\nTwitter US Airline Sentiment dataset. Airline-related tweets used for sentiment and negative reason analysis."
+    "text": "References\n\n\nHuber, S. (2025). How to use R for data science. https://hubchev.github.io/ds/\n\n\nLiu, B. (2012). Sentiment analysis and opinion mining. Morgan & Claypool Publishers. https://www.cs.uic.edu/~liub/FBS/SentimentAnalysis-and-OpinionMining.pdf\n\n\nPang, B., & Lee, L. (2008). Opinion mining and sentiment analysis. Foundations and Trends in Information Retrieval, 2(1–2), 1–135. https://doi.org/10.1561/1500000011\n\n\nSilge, J., & Robinson, D. (2017). Text mining with R: A tidy approach. O’Reilly Media. https://www.tidytextmining.com/\n\n\nWickham, H., Cetinkaya-Rundel, M., & Grolemund, G. (2023). R for data science: Import, tidy, transform, visualize, and model data (2nd ed.). O’Reilly Media. https://r4ds.hadley.nz/\n\n\nTwitter US Airline Sentiment dataset. Airline-related tweets used for sentiment and negative reason analysis. https://raw.githubusercontent.com/ruchitgandhi/Twitter-Airline-Sentiment-Analysis/master/Tweets.csv"
   },
   {
     "objectID": "presentation.html#presentation-details",

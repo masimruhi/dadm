@@ -30,13 +30,6 @@ format:
 
 bibliography: "liti.bib"
 csl: "apa.csl"
-nocite: |
-  @Huber2025RNotes
-  @Liu2012Sentiment
-  @Pang2008Opinion
-  @Silge2017Text
-  @Wickham2023R
-  @TwitterAirlineSentiment
 ---
 
 - **Student:** Mustafa Asım Ruhi
