@@ -1,35 +1,42 @@
 ---
+header-includes:
+  - \usepackage{etoolbox}
+  - \AtBeginEnvironment{Shaded}{\scriptsize}
+---
 title: "Decision Making with Sentiment Analysis in R"
 subtitle: "From Social Media Noise to Managerial Action"
 
 author:
   - name:
-      given: "Mustafa Asım"
-      family: "Ruhi"
-      literal: "Mustafa Asım Ruhi"
-    affiliation: "Fresenius University of Applied Sciences"
-    email: "ruhi.mustafa@stud.hs-fresenius.de"
+      given: Mustafa Asım
+      family: Ruhi
+      literal: Mustafa Asım Ruhi
+    affiliation: Fresenius University of Applied Sciences
+    email: ruhi.mustafa@stud.hs-fresenius.de
     corresponding: true
 
-course: "Data Analysis for Decision-Making"
-professor: "Prof. Dr. Stephan Huber"
+course: Data Analysis for Decision-Making
+professor: Prof. Dr. Stephan Huber
 date: "2 June 2026"
 date-format: long
-student-number: "401190044"
-
 abstract: "This handout explains how sentiment analysis can support managerial decision-making. It introduces the basic idea of sentiment analysis, presents a reproducible R workflow, and demonstrates how airline-related tweets can be transformed into decision-relevant insights. The example uses tidyverse and tidytext to clean, tokenize, visualize, and interpret customer feedback."
 
 format:
   apaquarto-pdf:
-    number-sections: true
     documentmode: doc
   html:
-    number-sections: true
     embed-resources: true
     page-layout: article
 
+a4paper: true
 bibliography: "liti.bib"
 csl: "apa.csl"
+reference-location: document
+number-sections: true
+execute:
+  warning: false
+  message: false
+student-number: "401190044"
 ---
 
 - **Student:** Mustafa Asım Ruhi
@@ -44,11 +51,7 @@ csl: "apa.csl"
 if (!require(pacman)) install.packages("pacman")
 pacman::p_load(tidyverse, janitor, tidytext, lubridate, scales, knitr)
 
-url <- paste0(
-  "https://raw.githubusercontent.com/",
-  "ruchitgandhi/Twitter-Airline-Sentiment-Analysis/",
-  "master/Tweets.csv"
-)
+url <- "https://raw.githubusercontent.com/ruchitgandhi/Twitter-Airline-Sentiment-Analysis/master/Tweets.csv"
 
 tweets <- readr::read_csv(url, show_col_types = FALSE) |>
   janitor::clean_names() |>
@@ -76,10 +79,7 @@ tweets_words <- tweets |>
   filter(str_detect(word, "[a-z]"), !str_detect(word, "^http"), !str_detect(word, "^t.co"))
 
 word_sentiments <- tweets_words |>
-  inner_join(
-    tidytext::get_sentiments("bing"),
-    by = "word"
-  )
+  inner_join(tidytext::get_sentiments("bing"), by = "word")
 
 top_sentiment_words <- word_sentiments |>
   count(sentiment, word, sort = TRUE) |>
@@ -114,6 +114,7 @@ decision_actions <- negative_reasons |>
 
 ## Online Access
 
+The handout and presentation are available online via GitHub Pages. Students can scan the QR code below to access the handout directly during the presentation.
 
 ::: {.callout-note title="Access the Handout" icon="false"}
 ![](fig/handout_qr.png){fig-align="center" width="35%"}
@@ -171,11 +172,7 @@ This structure makes the dataset useful for a classroom example. It contains bot
 The first step is to import and clean the data. The function `clean_names()` from the `janitor` package standardises variable names. The `select()` function keeps only the variables that are relevant for the analysis.
 
 ```r
-url <- paste0(
-  "https://raw.githubusercontent.com/",
-  "ruchitgandhi/Twitter-Airline-Sentiment-Analysis/",
-  "master/Tweets.csv"
-)
+url <- "https://raw.githubusercontent.com/ruchitgandhi/Twitter-Airline-Sentiment-Analysis/master/Tweets.csv"
 
 tweets <- readr::read_csv(url, show_col_types = FALSE) |>
   janitor::clean_names() |>
@@ -189,7 +186,7 @@ tweets <- readr::read_csv(url, show_col_types = FALSE) |>
   )
 ```
 
-This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later [@Huber2025RNotesRNotes].
+This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later.
 
 # Descriptive Analysis of Sentiment
 
@@ -254,11 +251,6 @@ negative_reasons <- tweets |>
 negative_reasons |>
   slice_max(n, n = 8) |>
   knitr::kable()
-```
-
-
-```{=latex}
-\clearpage
 ```
 
 ```{r}
@@ -357,10 +349,7 @@ A lexicon-based method uses a dictionary that assigns sentiment labels to words.
 
 ```r
 word_sentiments <- tweets_words |>
-  inner_join(
-    tidytext::get_sentiments("bing"),
-    by = "word"
-  )
+  inner_join(tidytext::get_sentiments("bing"), by = "word")
 
 word_sentiments |>
   count(sentiment, sort = TRUE)
@@ -369,10 +358,7 @@ word_sentiments |>
 ```{r}
 #| echo: false
 word_sentiments <- tweets_words |>
-  inner_join(
-    tidytext::get_sentiments("bing"),
-    by = "word"
-  )
+  inner_join(tidytext::get_sentiments("bing"), by = "word")
 
 word_sentiments |>
   count(sentiment, sort = TRUE) |>
@@ -417,7 +403,7 @@ top_sentiment_words |>
   facet_wrap(~ sentiment, scales = "free") +
   coord_flip() +
   labs(
-    title = "Most frequent sentiment words",
+    title = "Most frequent positive and negative sentiment words",
     x = "Word",
     y = "Frequency"
   ) +
@@ -437,7 +423,7 @@ top_sentiment_words |>
   facet_wrap(~ sentiment, scales = "free") +
   coord_flip() +
   labs(
-    title = "Most frequent sentiment words",
+    title = "Most frequent positive and negative sentiment words",
     x = "Word",
     y = "Frequency"
   ) +
@@ -495,9 +481,9 @@ ggplot(
   geom_col() +
   coord_flip() +
   labs(
-    title = "Sentiment score by airline",
+    title = "Lexicon-based sentiment score by airline",
     x = "Airline",
-    y = "Score per 100 words"
+    y = "Sentiment score per 100 words"
   ) +
   theme_minimal()
 ```
@@ -518,9 +504,9 @@ ggplot(
   geom_col() +
   coord_flip() +
   labs(
-    title = "Sentiment score by airline",
+    title = "Lexicon-based sentiment score by airline",
     x = "Airline",
-    y = "Score per 100 words"
+    y = "Sentiment score per 100 words"
   ) +
   theme_minimal()
 ```
@@ -533,17 +519,12 @@ The final step is to translate analytical results into decisions. A manager shou
 decision_actions <- negative_reasons |>
   mutate(
     managerial_action = case_when(
-      negativereason == "Customer Service Issue" ~
-        "Improve support capacity.",
-      negativereason == "Late Flight" ~
-        "Improve delay communication.",
-      negativereason == "Cancelled Flight" ~
-        "Strengthen rebooking process.",
-      negativereason == "Lost Luggage" ~
-        "Improve baggage tracking.",
-      negativereason == "Bad Flight" ~
-        "Improve in-flight experience.",
-      TRUE ~ "Investigate further."
+      negativereason == "Customer Service Issue" ~ "Improve support capacity and service recovery.",
+      negativereason == "Late Flight" ~ "Improve delay communication and punctuality.",
+      negativereason == "Cancelled Flight" ~ "Strengthen rebooking and compensation process.",
+      negativereason == "Lost Luggage" ~ "Improve baggage tracking.",
+      negativereason == "Bad Flight" ~ "Improve in-flight experience.",
+      TRUE ~ "Investigate this category further."
     )
   )
 
@@ -557,17 +538,12 @@ decision_actions |>
 decision_actions <- negative_reasons |>
   mutate(
     managerial_action = case_when(
-      negativereason == "Customer Service Issue" ~
-        "Improve support capacity.",
-      negativereason == "Late Flight" ~
-        "Improve delay communication.",
-      negativereason == "Cancelled Flight" ~
-        "Strengthen rebooking process.",
-      negativereason == "Lost Luggage" ~
-        "Improve baggage tracking.",
-      negativereason == "Bad Flight" ~
-        "Improve in-flight experience.",
-      TRUE ~ "Investigate further."
+      negativereason == "Customer Service Issue" ~ "Improve support capacity and service recovery.",
+      negativereason == "Late Flight" ~ "Improve delay communication and punctuality.",
+      negativereason == "Cancelled Flight" ~ "Strengthen rebooking and compensation process.",
+      negativereason == "Lost Luggage" ~ "Improve baggage tracking.",
+      negativereason == "Bad Flight" ~ "Improve in-flight experience.",
+      TRUE ~ "Investigate this category further."
     )
   )
 
@@ -600,14 +576,6 @@ customer_comments |>
   anti_join(stop_words, by = "word") |>
   inner_join(get_sentiments("bing"), by = "word") |>
   count(sentiment)
-
-# Show which words were matched as positive or negative
-customer_comments |>
-  unnest_tokens(word, text) |>
-  anti_join(stop_words, by = "word") |>
-  inner_join(get_sentiments("bing"), by = "word") |>
-  select(word, sentiment) |>
-  arrange(sentiment, word)
 ```
 
 Question: Which managerial action would be most suitable based on the negative words in the comments?

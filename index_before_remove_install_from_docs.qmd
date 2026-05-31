@@ -189,7 +189,7 @@ tweets <- readr::read_csv(url, show_col_types = FALSE) |>
   )
 ```
 
-This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later [@Huber2025RNotesRNotes].
+This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later [@Huber2025RNotes].
 
 # Descriptive Analysis of Sentiment
 
@@ -553,6 +553,14 @@ decision_actions |>
 ```
 
 ```{r}
+# Install packages if needed
+if (!require(tidyverse)) install.packages("tidyverse")
+if (!require(tidytext)) install.packages("tidytext")
+
+# Load packages
+library(tidyverse)
+library(tidytext)
+
 #| echo: false
 decision_actions <- negative_reasons |>
   mutate(
@@ -584,8 +592,6 @@ This table shows how sentiment analysis can move from description to decision su
 Run the following R code and answer the question below.
 
 ```r
-library(tidyverse)
-library(tidytext)
 
 customer_comments <- tibble(
   text = c(

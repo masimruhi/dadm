@@ -4,32 +4,35 @@ subtitle: "From Social Media Noise to Managerial Action"
 
 author:
   - name:
-      given: "Mustafa Asım"
-      family: "Ruhi"
-      literal: "Mustafa Asım Ruhi"
-    affiliation: "Fresenius University of Applied Sciences"
-    email: "ruhi.mustafa@stud.hs-fresenius.de"
+      given: Mustafa Asım
+      family: Ruhi
+      literal: Mustafa Asım Ruhi
+    affiliation: Fresenius University of Applied Sciences
+    email: ruhi.mustafa@stud.hs-fresenius.de
     corresponding: true
 
-course: "Data Analysis for Decision-Making"
-professor: "Prof. Dr. Stephan Huber"
+course: Data Analysis for Decision-Making
+professor: Prof. Dr. Stephan Huber
 date: "2 June 2026"
 date-format: long
-student-number: "401190044"
-
 abstract: "This handout explains how sentiment analysis can support managerial decision-making. It introduces the basic idea of sentiment analysis, presents a reproducible R workflow, and demonstrates how airline-related tweets can be transformed into decision-relevant insights. The example uses tidyverse and tidytext to clean, tokenize, visualize, and interpret customer feedback."
 
 format:
   apaquarto-pdf:
-    number-sections: true
     documentmode: doc
   html:
-    number-sections: true
     embed-resources: true
     page-layout: article
 
+a4paper: true
 bibliography: "liti.bib"
 csl: "apa.csl"
+reference-location: document
+number-sections: true
+execute:
+  warning: false
+  message: false
+student-number: "401190044"
 ---
 
 - **Student:** Mustafa Asım Ruhi
@@ -44,11 +47,7 @@ csl: "apa.csl"
 if (!require(pacman)) install.packages("pacman")
 pacman::p_load(tidyverse, janitor, tidytext, lubridate, scales, knitr)
 
-url <- paste0(
-  "https://raw.githubusercontent.com/",
-  "ruchitgandhi/Twitter-Airline-Sentiment-Analysis/",
-  "master/Tweets.csv"
-)
+url <- "https://raw.githubusercontent.com/ruchitgandhi/Twitter-Airline-Sentiment-Analysis/master/Tweets.csv"
 
 tweets <- readr::read_csv(url, show_col_types = FALSE) |>
   janitor::clean_names() |>
@@ -76,10 +75,7 @@ tweets_words <- tweets |>
   filter(str_detect(word, "[a-z]"), !str_detect(word, "^http"), !str_detect(word, "^t.co"))
 
 word_sentiments <- tweets_words |>
-  inner_join(
-    tidytext::get_sentiments("bing"),
-    by = "word"
-  )
+  inner_join(tidytext::get_sentiments("bing"), by = "word")
 
 top_sentiment_words <- word_sentiments |>
   count(sentiment, word, sort = TRUE) |>
@@ -114,6 +110,7 @@ decision_actions <- negative_reasons |>
 
 ## Online Access
 
+The handout and presentation are available online via GitHub Pages. Students can scan the QR code below to access the handout directly during the presentation.
 
 ::: {.callout-note title="Access the Handout" icon="false"}
 ![](fig/handout_qr.png){fig-align="center" width="35%"}
@@ -145,23 +142,13 @@ There are different approaches to sentiment analysis, including lexicon-based me
 
 # Data and Example Context
 
-The example uses the Twitter US Airline Sentiment dataset, which contains 14,640 airline-related tweets. The dataset includes the tweet text, the airline, a sentiment label, and, for negative tweets, a reason for the negative sentiment.
-
-The following code summarizes the distribution of the provided sentiment labels.
-
-```r
-tweets |>
-  count(airline_sentiment) |>
-  mutate(share = scales::percent(n / sum(n))) |>
-  knitr::kable()
-```
+The example uses the Twitter US Airline Sentiment dataset, which contains 14,640 airline-related tweets [@TwitterAirlineSentiment]. The dataset includes the tweet text, the airline, a sentiment label, and, for negative tweets, a reason for the negative sentiment.
 
 ```{r}
-#| echo: false
 tweets |>
   count(airline_sentiment) |>
   mutate(share = scales::percent(n / sum(n))) |>
-  knitr::kable()
+  knitr::kable(caption = "Sentiment distribution in the airline tweet dataset")
 ```
 
 This structure makes the dataset useful for a classroom example. It contains both unstructured text and already labelled sentiment categories. The labels make it possible to compare simple visual summaries with a dictionary-based text mining approach.
@@ -170,63 +157,21 @@ This structure makes the dataset useful for a classroom example. It contains bot
 
 The first step is to import and clean the data. The function `clean_names()` from the `janitor` package standardises variable names. The `select()` function keeps only the variables that are relevant for the analysis.
 
-```r
-url <- paste0(
-  "https://raw.githubusercontent.com/",
-  "ruchitgandhi/Twitter-Airline-Sentiment-Analysis/",
-  "master/Tweets.csv"
-)
+```{r, eval=FALSE}
+url <- "https://raw.githubusercontent.com/ruchitgandhi/Twitter-Airline-Sentiment-Analysis/master/Tweets.csv"
 
 tweets <- readr::read_csv(url, show_col_types = FALSE) |>
   janitor::clean_names() |>
-  select(
-    airline_sentiment,
-    negativereason,
-    airline,
-    retweet_count,
-    text,
-    tweet_created
-  )
+  select(airline_sentiment, negativereason, airline, retweet_count, text, tweet_created)
 ```
 
-This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later [@Huber2025RNotesRNotes].
+This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later [@Huber2025RNotes].
 
 # Descriptive Analysis of Sentiment
 
 Before applying text mining, it is useful to examine the provided sentiment labels. The following figure shows how negative, neutral, and positive tweets are distributed across airlines.
 
-```r
-sentiment_by_airline <- tweets |>
-  count(airline, airline_sentiment) |>
-  group_by(airline) |>
-  mutate(share = n / sum(n)) |>
-  ungroup()
-
-ggplot(sentiment_by_airline, aes(x = airline, y = share, fill = airline_sentiment)) +
-  geom_col(position = "fill") +
-  scale_y_continuous(labels = scales::percent) +
-  labs(
-    title = "Customer sentiment differs across airlines",
-    subtitle = "Share of negative, neutral, and positive tweets",
-    x = "Airline",
-    y = "Share of tweets",
-    fill = "Sentiment"
-  ) +
-  theme_minimal()
-```
-
 ```{r}
-#| echo: false
-#| fig-width: 6.2
-#| fig-height: 3.5
-#| out-width: "78%"
-#| fig-align: center
-sentiment_by_airline <- tweets |>
-  count(airline, airline_sentiment) |>
-  group_by(airline) |>
-  mutate(share = n / sum(n)) |>
-  ungroup()
-
 ggplot(sentiment_by_airline, aes(x = airline, y = share, fill = airline_sentiment)) +
   geom_col(position = "fill") +
   scale_y_continuous(labels = scales::percent) +
@@ -244,191 +189,86 @@ The figure is useful for decision-making because it allows managers to compare a
 
 # Negative Sentiment and Business Problems
 
-After the general sentiment overview, the analysis focuses on negative tweets. The dataset contains a variable that explains the reason behind many negative tweets. This is important because every negative reason can point to a different business problem.
-
-```r
-negative_reasons <- tweets |>
-  filter(airline_sentiment == "negative", !is.na(negativereason)) |>
-  count(negativereason, sort = TRUE)
-
-negative_reasons |>
-  slice_max(n, n = 8) |>
-  knitr::kable()
-```
-
-
-```{=latex}
-\clearpage
-```
+The dataset contains a variable that explains the reason behind many negative tweets. The following output shows the most frequent reasons for negative sentiment.
 
 ```{r}
-#| echo: false
-negative_reasons <- tweets |>
-  filter(airline_sentiment == "negative", !is.na(negativereason)) |>
-  count(negativereason, sort = TRUE)
-
 negative_reasons |>
   slice_max(n, n = 8) |>
-  knitr::kable()
-```
-
-The same result can also be visualised as a bar chart. This makes it easier to identify which business problems should receive attention first.
-
-```r
-negative_reasons |>
-  slice_max(n, n = 8) |>
-  ggplot(aes(x = reorder(negativereason, n), y = n)) +
-  geom_col() +
-  coord_flip() +
-  labs(
-    title = "Main reasons behind negative airline tweets",
-    x = "Negative reason",
-    y = "Number of tweets"
-  ) +
-  theme_minimal()
-```
-
-```{r}
-#| echo: false
-#| fig-width: 6.2
-#| fig-height: 3.5
-#| out-width: "78%"
-#| fig-align: center
-negative_reasons |>
-  slice_max(n, n = 8) |>
-  ggplot(aes(x = reorder(negativereason, n), y = n)) +
-  geom_col() +
-  coord_flip() +
-  labs(
-    title = "Main reasons behind negative airline tweets",
-    x = "Negative reason",
-    y = "Number of tweets"
-  ) +
-  theme_minimal()
+  knitr::kable(caption = "Most frequent reasons for negative sentiment")
 ```
 
 The results connect sentiment analysis to operational decision-making. Negative comments are not random; they often refer to service issues, delayed flights, cancelled flights, baggage problems, or booking problems. Each category suggests a different managerial response.
 
 # Text Mining and Tokenization
 
-A central step in text mining is tokenization. Tokenization means splitting text into smaller units. In this example, each tweet is split into individual words. Stop words such as common function words are removed because they usually do not provide much meaning for sentiment analysis.
+A central step in text mining is tokenization. Tokenization means splitting text into smaller units. In this example, each tweet is split into individual words. Stop words such as "the", "and", or "is" are removed because they usually do not provide much meaning for sentiment analysis.
 
-```r
+```{r, eval=FALSE}
 tweets_words <- tweets |>
   mutate(tweet_id = row_number()) |>
   select(tweet_id, airline, airline_sentiment, text) |>
   tidytext::unnest_tokens(word, text) |>
-  anti_join(tidytext::stop_words, by = "word") |>
-  filter(
-    stringr::str_detect(word, "[a-z]"),
-    !stringr::str_detect(word, "^http"),
-    !stringr::str_detect(word, "^t.co")
-  )
-
-tweets_words |>
-  count(word, sort = TRUE) |>
-  head(10)
+  anti_join(tidytext::stop_words, by = "word")
 ```
 
-```{r}
-#| echo: false
-tweets_words <- tweets |>
-  mutate(tweet_id = row_number()) |>
-  select(tweet_id, airline, airline_sentiment, text) |>
-  tidytext::unnest_tokens(word, text) |>
-  anti_join(tidytext::stop_words, by = "word") |>
-  filter(
-    stringr::str_detect(word, "[a-z]"),
-    !stringr::str_detect(word, "^http"),
-    !stringr::str_detect(word, "^t.co")
-  )
-
-tweets_words |>
-  count(word, sort = TRUE) |>
-  head(10) |>
-  knitr::kable()
-```
-
-The tidy approach is useful because the result is a table in which each row is one word from one tweet. This format can be filtered, counted, joined with dictionaries, and visualised using familiar `dplyr` and `ggplot2` functions.
+The tidy approach is useful because the result is a table in which each row is one word from one tweet. This format can be filtered, counted, joined with dictionaries, and visualised using familiar `dplyr` and `ggplot2` functions [@Silge2017Text].
 
 # Lexicon-Based Sentiment Analysis
 
 A lexicon-based method uses a dictionary that assigns sentiment labels to words. In this example, the Bing lexicon is used through the `get_sentiments("bing")` function. Words from the tweets are matched with positive and negative words from the dictionary.
 
-```r
+```{r, eval=FALSE}
 word_sentiments <- tweets_words |>
-  inner_join(
-    tidytext::get_sentiments("bing"),
-    by = "word"
-  )
-
-word_sentiments |>
-  count(sentiment, sort = TRUE)
+  inner_join(tidytext::get_sentiments("bing"), by = "word")
 ```
+
+This method is transparent and easy to explain. However, it has limitations. It may miss sarcasm, context, negation, and domain-specific meanings. For example, the word "delay" may clearly be negative in an airline context, while other words may depend strongly on context.
 
 ```{r}
-#| echo: false
-word_sentiments <- tweets_words |>
-  inner_join(
-    tidytext::get_sentiments("bing"),
-    by = "word"
-  )
-
-word_sentiments |>
-  count(sentiment, sort = TRUE) |>
-  knitr::kable()
-```
-
-This method is transparent and easy to explain. However, it has limitations. It may miss sarcasm, context, negation, and domain-specific meanings.
-
-The following code shows the most frequently matched positive and negative sentiment words.
-
-```r
-top_sentiment_words <- word_sentiments |>
-  count(sentiment, word, sort = TRUE) |>
-  group_by(sentiment) |>
-  slice_max(n, n = 8) |>
-  ungroup()
-
-top_sentiment_words |>
-  arrange(sentiment, desc(n))
-```
-
-```{r}
-#| echo: false
-top_sentiment_words <- word_sentiments |>
-  count(sentiment, word, sort = TRUE) |>
-  group_by(sentiment) |>
-  slice_max(n, n = 8) |>
-  ungroup()
-
 top_sentiment_words |>
   arrange(sentiment, desc(n)) |>
-  knitr::kable()
+  group_by(sentiment) |>
+  slice_head(n = 5) |>
+  knitr::kable(caption = "Frequently matched sentiment words")
 ```
 
-The presentation also uses the following figure to show frequent positive and negative words visually.
 
-```r
-top_sentiment_words |>
-  mutate(word = reorder(word, n)) |>
-  ggplot(aes(x = word, y = n, fill = sentiment)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~ sentiment, scales = "free") +
+# Additional Visual Analysis Used in the Presentation
+
+The presentation includes several visual outputs that support the interpretation of the analysis. To keep the handout consistent with the presentation, the following figures show how these outputs were produced in R.
+
+## Main Negative Reasons
+
+The following plot visualizes the most frequent reasons behind negative airline tweets. This is important for decision-making because each reason represents a possible operational problem.
+
+```{r}
+#| echo: true
+#| fig-width: 6.5
+#| fig-height: 3.8
+#| out-width: "80%"
+#| fig-align: center
+negative_reasons |>
+  slice_max(n, n = 8) |>
+  ggplot(aes(x = reorder(negativereason, n), y = n)) +
+  geom_col() +
   coord_flip() +
   labs(
-    title = "Most frequent sentiment words",
-    x = "Word",
-    y = "Frequency"
+    title = "Main reasons behind negative airline tweets",
+    x = "Negative reason",
+    y = "Number of tweets"
   ) +
   theme_minimal()
 ```
 
+## Frequent Sentiment Words
+
+After tokenizing the tweets and matching the words with the Bing sentiment lexicon, the following plot shows the most frequent positive and negative sentiment words. This helps make the lexicon-based sentiment analysis more interpretable.
+
 ```{r}
-#| echo: false
-#| fig-width: 6.2
-#| fig-height: 3.5
-#| out-width: "78%"
+#| echo: true
+#| fig-width: 6.5
+#| fig-height: 3.8
+#| out-width: "80%"
 #| fig-align: center
 top_sentiment_words |>
   mutate(word = reorder(word, n)) |>
@@ -437,76 +277,22 @@ top_sentiment_words |>
   facet_wrap(~ sentiment, scales = "free") +
   coord_flip() +
   labs(
-    title = "Most frequent sentiment words",
+    title = "Most frequent positive and negative sentiment words",
     x = "Word",
     y = "Frequency"
   ) +
   theme_minimal()
 ```
 
-The following code calculates a lexicon-based sentiment score for each airline.
+## Sentiment Score by Airline
 
-```r
-lexicon_airline_sentiment <- word_sentiments |>
-  count(airline, sentiment) |>
-  pivot_wider(
-    names_from = sentiment,
-    values_from = n,
-    values_fill = 0
-  ) |>
-  mutate(
-    lexicon_score = positive - negative,
-    total_sentiment_words = positive + negative,
-    lexicon_score_per_100_words = 100 * lexicon_score / total_sentiment_words
-  ) |>
-  arrange(lexicon_score_per_100_words)
-```
+The following plot provides an additional lexicon-based comparison across airlines. For each airline, the number of positive and negative sentiment words is counted. The score is calculated as positive words minus negative words, standardized per 100 sentiment words.
 
 ```{r}
-#| echo: false
-lexicon_airline_sentiment <- word_sentiments |>
-  count(airline, sentiment) |>
-  pivot_wider(
-    names_from = sentiment,
-    values_from = n,
-    values_fill = 0
-  ) |>
-  mutate(
-    lexicon_score = positive - negative,
-    total_sentiment_words = positive + negative,
-    lexicon_score_per_100_words = 100 * lexicon_score / total_sentiment_words
-  ) |>
-  arrange(lexicon_score_per_100_words)
-
-lexicon_airline_sentiment |>
-  knitr::kable()
-```
-
-The score is calculated as positive words minus negative words, standardized per 100 sentiment words.
-
-```r
-ggplot(
-  lexicon_airline_sentiment,
-  aes(
-    x = reorder(airline, lexicon_score_per_100_words),
-    y = lexicon_score_per_100_words
-  )
-) +
-  geom_col() +
-  coord_flip() +
-  labs(
-    title = "Sentiment score by airline",
-    x = "Airline",
-    y = "Score per 100 words"
-  ) +
-  theme_minimal()
-```
-
-```{r}
-#| echo: false
-#| fig-width: 6.2
-#| fig-height: 3.5
-#| out-width: "78%"
+#| echo: true
+#| fig-width: 6.5
+#| fig-height: 3.8
+#| out-width: "80%"
 #| fig-align: center
 ggplot(
   lexicon_airline_sentiment,
@@ -518,63 +304,24 @@ ggplot(
   geom_col() +
   coord_flip() +
   labs(
-    title = "Sentiment score by airline",
+    title = "Lexicon-based sentiment score by airline",
     x = "Airline",
-    y = "Score per 100 words"
+    y = "Sentiment score per 100 words"
   ) +
   theme_minimal()
 ```
+
+These figures are used as supporting evidence. The final decision-making step still requires managerial interpretation, because lexicon-based sentiment analysis can miss sarcasm, context, or ambiguous meanings.
 
 # From Analysis to Managerial Action
 
 The final step is to translate analytical results into decisions. A manager should not only ask whether sentiment is positive or negative. A better question is: What action should this result trigger?
 
-```r
-decision_actions <- negative_reasons |>
-  mutate(
-    managerial_action = case_when(
-      negativereason == "Customer Service Issue" ~
-        "Improve support capacity.",
-      negativereason == "Late Flight" ~
-        "Improve delay communication.",
-      negativereason == "Cancelled Flight" ~
-        "Strengthen rebooking process.",
-      negativereason == "Lost Luggage" ~
-        "Improve baggage tracking.",
-      negativereason == "Bad Flight" ~
-        "Improve in-flight experience.",
-      TRUE ~ "Investigate further."
-    )
-  )
-
-decision_actions |>
-  select(negativereason, n, managerial_action) |>
-  head(8)
-```
-
 ```{r}
-#| echo: false
-decision_actions <- negative_reasons |>
-  mutate(
-    managerial_action = case_when(
-      negativereason == "Customer Service Issue" ~
-        "Improve support capacity.",
-      negativereason == "Late Flight" ~
-        "Improve delay communication.",
-      negativereason == "Cancelled Flight" ~
-        "Strengthen rebooking process.",
-      negativereason == "Lost Luggage" ~
-        "Improve baggage tracking.",
-      negativereason == "Bad Flight" ~
-        "Improve in-flight experience.",
-      TRUE ~ "Investigate further."
-    )
-  )
-
 decision_actions |>
   select(negativereason, n, managerial_action) |>
   head(8) |>
-  knitr::kable()
+  knitr::kable(caption = "Converting negative sentiment reasons into managerial actions")
 ```
 
 This table shows how sentiment analysis can move from description to decision support. Customer service problems suggest a different response than lost luggage or delayed flights. In this sense, sentiment analysis can help managers prioritize resources.
@@ -583,7 +330,7 @@ This table shows how sentiment analysis can move from description to decision su
 
 Run the following R code and answer the question below.
 
-```r
+```{r, eval=FALSE}
 library(tidyverse)
 library(tidytext)
 
@@ -600,22 +347,14 @@ customer_comments |>
   anti_join(stop_words, by = "word") |>
   inner_join(get_sentiments("bing"), by = "word") |>
   count(sentiment)
-
-# Show which words were matched as positive or negative
-customer_comments |>
-  unnest_tokens(word, text) |>
-  anti_join(stop_words, by = "word") |>
-  inner_join(get_sentiments("bing"), by = "word") |>
-  select(word, sentiment) |>
-  arrange(sentiment, word)
 ```
 
 Question: Which managerial action would be most suitable based on the negative words in the comments?
 
-A) Reduce the number of customer support channels  
-B) Improve delay communication and luggage recovery processes  
-C) Ignore negative comments because they are unstructured data  
-D) Only focus on positive words
+A)  Reduce the number of customer support channels\
+B)  Improve delay communication and luggage recovery processes\
+C)  Ignore negative comments because they are unstructured data\
+D)  Only focus on positive words
 
 Correct answer: B) Improve delay communication and luggage recovery processes.
 

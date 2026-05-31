@@ -2,8 +2,8 @@
 title: "Decision Making with Sentiment Analysis in R"
 subtitle: "From Social Media Noise to Managerial Action"
 author: "Mustafa Asım Ruhi 401190044<br>ruhi.mustafa@stud.hs-fresenius.de</span>"
-institute: "Fresenius University of Applied Sciences<br>Course: Data Analysis for Decision-Making"
-date: "2 June 2026"
+institute: "Fresenius University of Applied Sciences<br>Course: Data Analysis for Decision-Making<br>Professor: Prof. Dr. Stephan Huber<br>2 June 2026"
+date: ""
 format:
   revealjs:
     theme: simple
@@ -136,14 +136,26 @@ Sentiment analysis is a text mining method used to identify opinions, emotions, 
 <div class="box">Sentiment analysis helps prioritize business actions.</div>
 </div>
 
+## Different Sentiment Analysis Methods
+
+| Method | Basic idea | Why not used / selected? |
+|---|---|---|
+| Lexicon-based | Uses predefined sentiment dictionaries | Selected because it is transparent and easy to reproduce in RStudio |
+| Machine learning | Trains a model on labeled text data | Requires training/testing setup |
+| Transformer-based | Uses context-aware models such as BERT | More complex for a short live demo |
+| Hybrid | Combines dictionaries and machine learning | More advanced setup |
+
+
+In this project, I use a lexicon-based approach because it is transparent, reproducible, and suitable for a short RStudio demonstration.
+
 ## From Text to Managerial Action
 
 <div class="flow-grid">
-<div class="flow-box"><b>1</b><br>Collect text</div>
-<div class="flow-box"><b>2</b><br>Clean data</div>
-<div class="flow-box"><b>3</b><br>Measure sentiment</div>
-<div class="flow-box"><b>4</b><br>Find problems</div>
-<div class="flow-box"><b>5</b><br>Recommend action</div>
+<div class="flow-box"><span class="step-number">1</span><span class="step-label">Collect text</span></div>
+<div class="flow-box"><span class="step-number">2</span><span class="step-label">Clean data</span></div>
+<div class="flow-box"><span class="step-number">3</span><span class="step-label">Measure sentiment</span></div>
+<div class="flow-box"><span class="step-number">4</span><span class="step-label">Find problems</span></div>
+<div class="flow-box"><span class="step-number">5</span><span class="step-label">Recommend action</span></div>
 </div>
 
 ## Case Study: Airline Tweets
@@ -201,6 +213,17 @@ tweets_words <- tweets |>
   anti_join(stop_words, by = "word")
 ```
 
+<div class='example-card-wide'>
+<b>Example</b><br>
+<span class='example-sentence'>The flight was delayed and the service was terrible.</span>
+<br><br>
+<b>After tokenization:</b><br>
+<span class='token'>flight</span>
+<span class='token'>delayed</span>
+<span class='token'>service</span>
+<span class='token'>terrible</span>
+</div>
+
 ## Lexicon-Based Sentiment Analysis
 
 ```{r}
@@ -210,6 +233,16 @@ tweets_words <- tweets |>
 word_sentiments <- tweets_words |>
   inner_join(get_sentiments("bing"), by = "word")
 ```
+
+<div class='example-card-wide'>
+<b>Example word matching with Bing lexicon</b><br><span class='example-sentence'>The flight was delayed and terrible, but the staff was helpful and comfortable.</span><br><br>
+<span class='token negative-token'>terrible</span> → negative&nbsp;&nbsp;
+<span class='token negative-token'>delayed</span> → negative&nbsp;&nbsp;
+<span class='token positive-token'>helpful</span> → positive&nbsp;&nbsp;
+<span class='token positive-token'>comfortable</span> → positive
+<br><br>
+<span class='mini-note'>Words that are not found in the dictionary are not labelled as neutral; they are excluded from the lexicon-based count.</span>
+</div>
 
 ## Frequent Sentiment Words
 
@@ -457,5 +490,64 @@ Data Analysis for Decision-Making<br>
 
 .reveal .slide-number {
   font-size: 0.45em;
+}
+</style>
+
+<style>
+.flow-box { flex-direction: column !important; gap: 12px !important; text-align: center !important; }
+.step-number { display: block; font-size: 1.35em; font-weight: 800; line-height: 1; }
+.step-label { display: block; font-size: 0.92em; line-height: 1.15; }
+</style>
+
+<style id='flow-align-safe-fix'>
+.flow-box {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  gap: 8px !important;
+}
+.flow-box b {
+  display: block !important;
+  font-size: 1.25em !important;
+  line-height: 1 !important;
+  margin: 0 !important;
+}
+</style>
+
+
+
+<style id='example-slide-styles-v2'>
+.example-card-wide {
+  margin-top: 16px;
+  background: #f8fbf8;
+  border: 2px solid #d7e7dc;
+  border-radius: 16px;
+  padding: 18px 22px;
+  font-size: 0.66em;
+  line-height: 1.35;
+  text-align: left;
+}
+.example-sentence {
+  font-style: italic;
+}
+.token {
+  display: inline-block;
+  margin: 4px 5px 4px 0;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #eaf2ee;
+  font-size: 0.92em;
+}
+.negative-token {
+  background: #f8dddd;
+}
+.positive-token {
+  background: #dff0e3;
+}
+.mini-note {
+  font-size: 0.9em;
+  color: #555;
 }
 </style>

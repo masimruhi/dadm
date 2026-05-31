@@ -4285,7 +4285,7 @@ word-break: break-word;
 </section>
 <section id="introduction" class="level1" data-number="1">
 <h1 data-number="1"><span class="header-section-number">1</span> Introduction</h1>
-<p>Modern companies receive large amounts of customer feedback through social media, online reviews, support chats, and survey comments. Much of this feedback is unstructured text, which means that it cannot be analysed as directly as numerical variables such as sales, prices, or ratings. Sentiment analysis helps convert this kind of text into structured information that can support decision-making <span class="citation" data-cites="Liu2012Sentiment Pang2008Opinion">(<a href="#ref-Liu2012Sentiment" role="doc-biblioref">Liu, 2012</a>; <a href="#ref-Pang2008Opinion" role="doc-biblioref">Pang &amp; Lee, 2008</a>)</span>.</p>
+<p>Modern companies receive large amounts of customer feedback through social media, online reviews, support chats, and survey comments. Much of this feedback is unstructured text, which means that it cannot be analysed as directly as numerical variables such as sales, prices, or ratings. Sentiment analysis helps convert this kind of text into structured information that can support decision-making <span class="citation" data-cites="Liu2012Sentiment Pang2008Opinion">(<a href="#ref-Liu2012Sentiment" role="doc-biblioref">Liu, 2012</a>; <a href="#ref-Pang2008Opinion" role="doc-biblioref"><strong>Pang2008Opinion?</strong></a>)</span>.</p>
 <p>This handout focuses on a practical question: How can customer tweets be transformed into decision-relevant insights for airline management? The example uses airline-related tweets and demonstrates a reproducible workflow in R. The goal is not only to classify text as positive or negative, but to connect the result to managerial action.</p>
 </section>
 <section id="what-is-sentiment-analysis" class="level1" data-number="2">
@@ -4358,7 +4358,7 @@ word-break: break-word;
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    text,</span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    tweet_created</span>
 <span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later <span class="citation" data-cites="Huber2025RNotes">(<a href="#ref-Huber2025RNotes" role="doc-biblioref">Huber, 2025</a>)</span>.</p>
+<p>This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later <span class="citation" data-cites="Huber2025RNotesRNotes">(<a href="#ref-Huber2025RNotesRNotes" role="doc-biblioref"><strong>Huber2025RNotesRNotes?</strong></a>)</span>.</p>
 </section>
 <section id="descriptive-analysis-of-sentiment" class="level1" data-number="6">
 <h1 data-number="6"><span class="header-section-number">6</span> Descriptive Analysis of Sentiment</h1>
@@ -4915,7 +4915,15 @@ word-break: break-word;
 <span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, text) <span class="sc">|&gt;</span></span>
 <span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(stop_words, <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">|&gt;</span></span>
 <span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(<span class="fu">get_sentiments</span>(<span class="st">&quot;bing&quot;</span>), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(sentiment)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(sentiment)</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Show which words were matched as positive or negative</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>customer_comments <span class="sc">|&gt;</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest_tokens</span>(word, text) <span class="sc">|&gt;</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">anti_join</span>(stop_words, <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">inner_join</span>(<span class="fu">get_sentiments</span>(<span class="st">&quot;bing&quot;</span>), <span class="at">by =</span> <span class="st">&quot;word&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(word, sentiment) <span class="sc">|&gt;</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(sentiment, word)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Question: Which managerial action would be most suitable based on the negative words in the comments?</p>
 <ol type="A">
 <li>Reduce the number of customer support channels<br>
@@ -4971,15 +4979,9 @@ word-break: break-word;
 <section id="references" class="level1" data-number="14">
 <h1 data-number="14"><span class="header-section-number">14</span> References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
-<div id="ref-Huber2025RNotes" class="csl-entry" role="listitem">
-Huber, S. (2025). <em>How to use r for data science: Lecture notes</em>. Fresenius University of Applied Sciences.
-</div>
 <div id="ref-Liu2012Sentiment" class="csl-entry" role="listitem">
 Liu, B. (2012). <em>Sentiment analysis and opinion mining</em>. Morgan<br>
 &amp; Claypool Publishers. <a href="https://www.cs.uic.edu/~liub/FBS/SentimentAnalysis-and-OpinionMining.pdf">https://www.cs.uic.edu/~liub/FBS/SentimentAnalysis-and-OpinionMining.pdf</a>
-</div>
-<div id="ref-Pang2008Opinion" class="csl-entry" role="listitem">
-Pang, B., &amp; Lee, L. (2008). Opinion mining and sentiment analysis. <em>Foundations and Trends in Information Retrieval</em>, <em>2</em>(1-2), 1–135. <a href="https://doi.org/10.1561/1500000011">https://doi.org/10.1561/1500000011</a>
 </div>
 <div id="ref-Silge2017Text" class="csl-entry" role="listitem">
 Silge, J., &amp; Robinson, D. (2017). <em>Text mining with r: A tidy approach</em>. O’Reilly Media. <a href="https://www.tidytextmining.com/">https://www.tidytextmining.com/</a>

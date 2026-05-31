@@ -13,7 +13,7 @@ author:
 
 course: Data Analysis for Decision-Making
 professor: Prof. Dr. Stephan Huber
-date: 2026/06/02
+date: "2 June 2026"
 date-format: long
 abstract: "This handout explains how sentiment analysis can support managerial decision-making. It introduces the basic idea of sentiment analysis, presents a reproducible R workflow, and demonstrates how airline-related tweets can be transformed into decision-relevant insights. The example uses tidyverse and tidytext to clean, tokenize, visualize, and interpret customer feedback."
 
@@ -35,12 +35,11 @@ execute:
 student-number: "401190044"
 ---
 
-**Student:** Mustafa Asım Ruhi  
-**Student number:** 401190044  
-**Course:** Data Analysis for Decision-Making  
-**University:** Fresenius University of Applied Sciences  
-**Email:** ruhi.mustafa@stud.hs-fresenius.de
-
+**Student:** Mustafa Asım Ruhi\
+**Student number:** 401190044\
+**Course:** Data Analysis for Decision-Making\
+**University:** Fresenius University of Applied Sciences\
+**Email:** ruhi.mustafa\@stud.hs-fresenius.de
 
 ```{r setup, include=FALSE}
 if (!require(pacman)) install.packages("pacman")
@@ -107,6 +106,18 @@ decision_actions <- negative_reasons |>
   )
 ```
 
+## Online Access
+
+The handout and presentation are available online via GitHub Pages. Students can scan the QR code below to access the handout directly during the presentation.
+
+::: {.callout-note title="Access the Handout" icon="false"}
+![](fig/handout_qr.png){fig-align="center" width="35%"}
+
+- **Handout:** <https://masimruhi.github.io/dadm/index.html>
+- **Presentation:** <https://masimruhi.github.io/dadm/presentation.html>
+- **Repository:** <https://github.com/masimruhi/dadm>
+:::
+
 # Introduction
 
 Modern companies receive large amounts of customer feedback through social media, online reviews, support chats, and survey comments. Much of this feedback is unstructured text, which means that it cannot be analysed as directly as numerical variables such as sales, prices, or ratings. Sentiment analysis helps convert this kind of text into structured information that can support decision-making [@Liu2012Sentiment; @Pang2008Opinion].
@@ -124,6 +135,8 @@ A typical workflow includes importing text data, cleaning it, splitting the text
 Decision-makers often need to identify which problems deserve attention first. When feedback is scattered across thousands of tweets, manual reading becomes slow and inconsistent. Sentiment analysis can quickly summarize the emotional tone of customer comments and highlight repeated sources of dissatisfaction.
 
 For example, if an airline receives many negative comments about delayed flights, management can improve delay communication, operational punctuality, or compensation processes. If most negative comments refer to customer service, management may prioritize staff training, support capacity, or service recovery. The value of sentiment analysis therefore depends on whether the results lead to concrete decisions.
+
+There are different approaches to sentiment analysis, including lexicon-based methods, machine learning methods, transformer-based models, and hybrid approaches. This project focuses on a lexicon-based approach because it is transparent, reproducible in RStudio, and suitable for a short live demonstration.
 
 # Data and Example Context
 
@@ -274,30 +287,28 @@ Sentiment analysis helps transform unstructured customer feedback into informati
 
 The main lesson is that the value of sentiment analysis is not the sentiment label itself. The value is the decision that follows from it. When text analysis identifies repeated customer pain points, managers can prioritize concrete improvements in service, communication, booking processes, or baggage handling.
 
-# Affidavit
-
-::: {.callout-tip appearance="default" title="Affidavit" icon="false"}
-I hereby affirm that this submitted paper was authored unaided and solely by me. Additionally, no other sources than those in the reference list were used. Parts of this paper, including tables and figures, that have been taken either verbatim or analogously from other works have in each case been properly cited with regard to their origin and authorship. This paper either in parts or in its entirety, be it in the same or similar form, has not been submitted to any other examination board and has not been published.
+::: {.callout-tip title="Affidavit" icon="false"}
+I hereby affirm that this submitted paper was authored unaided and solely by me. Additionally, no other sources than those in the reference list were used. Parts of this paper, including tables and figures, that have been taken either verbatim or analogously from other works have in each case been properly cited with regard to their origin and authorship. This paper, either in parts or in its entirety, be it in the same or similar form, has not been submitted to any other examination board and has not been published.
 
 I acknowledge that the university may use plagiarism detection software to check my thesis. I agree to cooperate with any investigation of suspected plagiarism and to provide any additional information or evidence requested by the university.
 
-Mustafa Asım Ruhi, \[02/06/2026\], \[Köln\]
+Checklist:
+
+- [x] The handout contains 3-5 pages of text.
+- [x] The submission contains the Quarto file of the handout.
+- [x] The submission contains the Quarto file of the presentation.
+- [x] The submission contains the HTML file of the handout.
+- [x] The submission contains the HTML file of the presentation.
+- [x] The submission contains the PDF file of the handout.
+- [x] The submission contains the PDF file of the presentation.
+- [x] The title page of the presentation and the handout contain personal details: name, email, and matriculation number.
+- [x] The handout contains a bibliography, created using BibTeX with an APA citation style.
+- [x] Either the handout or the presentation contains R code that proves the expertise in coding.
+- [x] The filled out Affidavit.
+- [x] The link to the presentation and the handout published on GitHub.
+
+Mustafa Asım Ruhi, 2 June 2026, Cologne
 :::
-
-# Checklist
-
-- [ ] The handout contains 3-5 pages of text.
-- [ ] The submission contains the Quarto file of the handout.
-- [ ] The submission contains the Quarto file of the presentation.
-- [ ] The submission contains the HTML file of the handout.
-- [ ] The submission contains the HTML file of the presentation.
-- [ ] The submission contains the PDF file of the handout.
-- [ ] The submission contains the PDF file of the presentation.
-- [ ] The title page of the presentation and the handout contain personal details.
-- [ ] The handout contains a bibliography created using BibTeX with APA citation style.
-- [ ] Either the handout or the presentation contains R code that proves coding expertise.
-- [ ] The filled out Affidavit.
-- [ ] The link to the presentation and the handout published on GitHub.
 
 # References
 

@@ -189,7 +189,7 @@ tweets <- readr::read_csv(url, show_col_types = FALSE) |>
   )
 ```
 
-This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later [@Huber2025RNotesRNotes].
+This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later [@Huber2025RNotes].
 
 # Descriptive Analysis of Sentiment
 

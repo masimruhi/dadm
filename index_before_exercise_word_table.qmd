@@ -189,7 +189,7 @@ tweets <- readr::read_csv(url, show_col_types = FALSE) |>
   )
 ```
 
-This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later [@Huber2025RNotesRNotes].
+This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later [@Huber2025RNotes].
 
 # Descriptive Analysis of Sentiment
 
@@ -600,14 +600,6 @@ customer_comments |>
   anti_join(stop_words, by = "word") |>
   inner_join(get_sentiments("bing"), by = "word") |>
   count(sentiment)
-
-# Show which words were matched as positive or negative
-customer_comments |>
-  unnest_tokens(word, text) |>
-  anti_join(stop_words, by = "word") |>
-  inner_join(get_sentiments("bing"), by = "word") |>
-  select(word, sentiment) |>
-  arrange(sentiment, word)
 ```
 
 Question: Which managerial action would be most suitable based on the negative words in the comments?
