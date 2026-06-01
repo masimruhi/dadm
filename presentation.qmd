@@ -83,19 +83,6 @@ top_sentiment_words <- word_sentiments |>
   slice_max(n, n = 8) |>
   ungroup()
 
-lexicon_airline_sentiment <- word_sentiments |>
-  count(airline, sentiment) |>
-  pivot_wider(
-    names_from = sentiment,
-    values_from = n,
-    values_fill = 0
-  ) |>
-  mutate(
-    lexicon_score = positive - negative,
-    total_sentiment_words = positive + negative,
-    lexicon_score_per_100_words = 100 * lexicon_score / total_sentiment_words
-  ) |>
-  arrange(lexicon_score_per_100_words)
 
 decision_actions <- negative_reasons |>
   mutate(
@@ -224,6 +211,18 @@ tweets_words <- tweets |>
 <span class='token'>terrible</span>
 </div>
 
+
+
+## Lexicon Choices
+
+| Lexicon | Output | Usefulness |
+|---|---|---|
+| **Bing** | Positive / negative | Simple and transparent for live demo |
+| **AFINN** | Numerical score | Shows sentiment intensity |
+| **NRC** | Emotion categories | Shows anger, fear, joy, sadness, and trust |
+
+**Why Bing?** Bing is easy to explain, reproducible in RStudio, and clearly shows which words are matched as positive or negative.
+
 ## Lexicon-Based Sentiment Analysis
 
 ```{r}
@@ -257,25 +256,6 @@ top_sentiment_words |>
   facet_wrap(~ sentiment, scales = "free") +
   coord_flip() +
   labs(x = "Word", y = "Frequency") +
-  theme_minimal(base_size = 15)
-```
-
-## Sentiment Score by Airline
-
-```{r}
-#| fig-width: 8.5
-#| fig-height: 4.3
-
-ggplot(
-  lexicon_airline_sentiment,
-  aes(
-    x = reorder(airline, lexicon_score_per_100_words),
-    y = lexicon_score_per_100_words
-  )
-) +
-  geom_col() +
-  coord_flip() +
-  labs(x = "Airline", y = "Sentiment score per 100 words") +
   theme_minimal(base_size = 15)
 ```
 
@@ -616,3 +596,4 @@ Data Analysis for Decision-Making<br>
   margin: 0 0 9px 0;
 }
 </style>
+

@@ -94,15 +94,6 @@ top_sentiment_words <- word_sentiments |>
   slice_max(n, n = 10) |>
   ungroup()
 
-lexicon_airline_sentiment <- word_sentiments |>
-  count(airline, sentiment) |>
-  pivot_wider(names_from = sentiment, values_from = n, values_fill = 0) |>
-  mutate(
-    lexicon_score = positive - negative,
-    total_sentiment_words = positive + negative,
-    lexicon_score_per_100_words = 100 * lexicon_score / total_sentiment_words
-  ) |>
-  arrange(lexicon_score_per_100_words)
 
 decision_actions <- negative_reasons |>
   mutate(
@@ -163,6 +154,9 @@ tweets |>
   knitr::kable()
 ```
 
+<!-- precise-caption-table-1 -->
+*Table 1. Overall sentiment distribution in the airline tweet dataset.*
+
 ```{r}
 #| echo: false
 tweets |>
@@ -196,7 +190,7 @@ tweets <- readr::read_csv(url, show_col_types = FALSE) |>
   )
 ```
 
-This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later [@Huber2025RNotesRNotes].
+This step follows an important principle in reproducible data analysis: the workflow should be written in code so that the analysis can be repeated or adjusted later [@Huber2025RNotes].
 
 # Descriptive Analysis of Sentiment
 
@@ -246,6 +240,9 @@ ggplot(sentiment_by_airline, aes(x = airline, y = share, fill = airline_sentimen
   ) +
   theme_minimal()
 ```
+<!-- precise-caption-figure-1 -->
+*Figure 1. Sentiment distribution by airline.*
+
 
 The figure is useful for decision-making because it allows managers to compare airlines quickly. However, a sentiment label alone is not enough. A manager also needs to understand why customers are dissatisfied.
 
@@ -267,6 +264,9 @@ negative_reasons |>
 ```{=latex}
 \clearpage
 ```
+
+<!-- precise-caption-table-2 -->
+*Table 2. Main negative reasons in customer tweets.*
 
 ```{r}
 #| echo: false
@@ -313,6 +313,9 @@ negative_reasons |>
   ) +
   theme_minimal()
 ```
+<!-- precise-caption-figure-2 -->
+*Figure 2. Most frequent negative reasons behind airline-related complaints.*
+
 
 The results connect sentiment analysis to operational decision-making. Negative comments are not random; they often refer to service issues, delayed flights, cancelled flights, baggage problems, or booking problems. Each category suggests a different managerial response.
 
@@ -337,6 +340,9 @@ tweets_words |>
   head(10)
 ```
 
+<!-- precise-caption-table-3 -->
+*Table 3. Most frequent words after tokenization and stop-word removal.*
+
 ```{r}
 #| echo: false
 tweets_words <- tweets |>
@@ -358,6 +364,19 @@ tweets_words |>
 
 The tidy approach is useful because the result is a table in which each row is one word from one tweet. This format can be filtered, counted, joined with dictionaries, and visualised using familiar `dplyr` and `ggplot2` functions.
 
+
+# Lexicon Choices for Sentiment Analysis
+
+Lexicon-based sentiment analysis can use different dictionaries. In this project, the Bing lexicon is used, but other lexicons such as AFINN and NRC are also available.
+
+| Lexicon | Output type | What it shows | Why / when useful |
+|---|---|---|---|
+| Bing | Positive / negative categories | Whether matched words are positive or negative | Simple, transparent, and suitable for a short RStudio demonstration |
+| AFINN | Numerical sentiment score | Direction and intensity of sentiment | Useful when the strength of sentiment matters |
+| NRC | Emotion categories | Emotions such as anger, fear, joy, sadness, and trust | Useful for richer emotional analysis |
+
+In this handout, the Bing lexicon is used because it is simple, transparent, and easy to reproduce during a short presentation. It clearly shows which words are classified as positive or negative. Other lexicons could provide more detailed results, but Bing is the most suitable choice for demonstrating the basic logic of lexicon-based sentiment analysis.
+
 # Lexicon-Based Sentiment Analysis
 
 A lexicon-based method uses a dictionary that assigns sentiment labels to words. In this example, the Bing lexicon is used through the `get_sentiments("bing")` function. Words from the tweets are matched with positive and negative words from the dictionary.
@@ -372,6 +391,9 @@ word_sentiments <- tweets_words |>
 word_sentiments |>
   count(sentiment, sort = TRUE)
 ```
+
+<!-- precise-caption-table-4 -->
+*Table 4. Positive and negative word counts using the Bing lexicon.*
 
 ```{r}
 #| echo: false
@@ -400,6 +422,9 @@ top_sentiment_words <- word_sentiments |>
 top_sentiment_words |>
   arrange(sentiment, desc(n))
 ```
+
+<!-- precise-caption-table-5 -->
+*Table 5. Most frequent positive and negative sentiment words.*
 
 ```{r}
 #| echo: false
@@ -450,87 +475,9 @@ top_sentiment_words |>
   ) +
   theme_minimal()
 ```
+<!-- precise-caption-figure-3 -->
+*Figure 3. Most frequent sentiment words identified with the Bing lexicon.*
 
-The following code calculates a lexicon-based sentiment score for each airline.
-
-```r
-lexicon_airline_sentiment <- word_sentiments |>
-  count(airline, sentiment) |>
-  pivot_wider(
-    names_from = sentiment,
-    values_from = n,
-    values_fill = 0
-  ) |>
-  mutate(
-    lexicon_score = positive - negative,
-    total_sentiment_words = positive + negative,
-    lexicon_score_per_100_words = 100 * lexicon_score / total_sentiment_words
-  ) |>
-  arrange(lexicon_score_per_100_words)
-```
-
-```{r}
-#| echo: false
-lexicon_airline_sentiment <- word_sentiments |>
-  count(airline, sentiment) |>
-  pivot_wider(
-    names_from = sentiment,
-    values_from = n,
-    values_fill = 0
-  ) |>
-  mutate(
-    lexicon_score = positive - negative,
-    total_sentiment_words = positive + negative,
-    lexicon_score_per_100_words = 100 * lexicon_score / total_sentiment_words
-  ) |>
-  arrange(lexicon_score_per_100_words)
-
-lexicon_airline_sentiment |>
-  knitr::kable()
-```
-
-The score is calculated as positive words minus negative words, standardized per 100 sentiment words.
-
-```r
-ggplot(
-  lexicon_airline_sentiment,
-  aes(
-    x = reorder(airline, lexicon_score_per_100_words),
-    y = lexicon_score_per_100_words
-  )
-) +
-  geom_col() +
-  coord_flip() +
-  labs(
-    title = "Sentiment score by airline",
-    x = "Airline",
-    y = "Score per 100 words"
-  ) +
-  theme_minimal()
-```
-
-```{r}
-#| echo: false
-#| fig-width: 6.2
-#| fig-height: 3.5
-#| out-width: "78%"
-#| fig-align: center
-ggplot(
-  lexicon_airline_sentiment,
-  aes(
-    x = reorder(airline, lexicon_score_per_100_words),
-    y = lexicon_score_per_100_words
-  )
-) +
-  geom_col() +
-  coord_flip() +
-  labs(
-    title = "Sentiment score by airline",
-    x = "Airline",
-    y = "Score per 100 words"
-  ) +
-  theme_minimal()
-```
 
 # From Analysis to Managerial Action
 
@@ -558,6 +505,9 @@ decision_actions |>
   select(negativereason, n, managerial_action) |>
   head(8)
 ```
+
+<!-- precise-caption-table-6 -->
+*Table 6. Managerial actions derived from negative reason categories.*
 
 ```{r}
 #| echo: false

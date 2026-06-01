@@ -147,42 +147,6 @@ top_sentiment_words |>
   theme_minimal()
 
 # ------------------------------------------------------------
-# 9. Sentiment score by airline
-# ------------------------------------------------------------
-
-lexicon_airline_sentiment <- word_sentiments |>
-  count(airline, sentiment) |>
-  pivot_wider(
-    names_from = sentiment,
-    values_from = n,
-    values_fill = 0
-  ) |>
-  mutate(
-    lexicon_score = positive - negative,
-    total_sentiment_words = positive + negative,
-    lexicon_score_per_100_words = 100 * lexicon_score / total_sentiment_words
-  ) |>
-  arrange(lexicon_score_per_100_words)
-
-lexicon_airline_sentiment
-
-lexicon_airline_sentiment |>
-  ggplot(
-    aes(
-      x = reorder(airline, lexicon_score_per_100_words),
-      y = lexicon_score_per_100_words
-    )
-  ) +
-  geom_col() +
-  coord_flip() +
-  labs(
-    title = "Lexicon-based sentiment score by airline",
-    x = "Airline",
-    y = "Score per 100 words"
-  ) +
-  theme_minimal()
-
-# ------------------------------------------------------------
 # 10. From analysis to managerial actions
 # ------------------------------------------------------------
 

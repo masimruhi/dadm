@@ -299,5 +299,12 @@
     "title": "Decision Making with Sentiment Analysis in R",
     "section": "Exercise Question",
     "text": "Exercise Question\n\nQuestion: Which managerial action would be most suitable based on the negative words in the comments?  A) Reduce the number of customer support channels B) Improve delay communication and luggage recovery processes C) Ignore negative comments because they are unstructured data D) Only focus on positive words"
+  },
+  {
+    "objectID": "presentation.html#lexicon-choices",
+    "href": "presentation.html#lexicon-choices",
+    "title": "Decision Making with Sentiment Analysis in R",
+    "section": "Lexicon Choices",
+    "text": "Lexicon Choices\n\n\n\n\n\n\n\n\nLexicon\nOutput\nUsefulness\n\n\n\n\nBing\nPositive / negative\nSimple and transparent for live demo\n\n\nAFINN\nNumerical score\nShows sentiment intensity\n\n\nNRC\nEmotion categories\nShows anger, fear, joy, sadness, and trust\n\n\n\nWhy Bing? Bing is easy to explain, reproducible in RStudio, and clearly shows which words are matched as positive or negative."
   }
 ]
